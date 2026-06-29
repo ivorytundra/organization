@@ -54,6 +54,9 @@ interface JWTWithTokens {
 }
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
+  // Trust the deployment's host header. Vercel sets this automatically, but
+  // making it explicit avoids "UntrustedHost" errors on other hosts.
+  trustHost: true,
   providers: [
     Google({
       authorization: {

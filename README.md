@@ -82,15 +82,47 @@ Results are then ranked: **important + unread** first, then starred, then plain
 unread, newest within each tier. Tweak the query and the `score()` function to
 match your own definition of "important".
 
-## Deploying
+## Deploying to a public URL (Vercel)
 
-The app is a standard Next.js app and deploys cleanly to
-[Vercel](https://vercel.com/) or any Node host. Remember to:
+This is the easiest way to get a link you can open from any device. The free
+"Hobby" plan is plenty.
 
-- Set the same environment variables in your host (with `AUTH_URL` pointing at
-  your production domain).
-- Add `https://<your-domain>/api/auth/callback/google` as an authorized
-  redirect URI in the Google Cloud console.
+1. **Push this repo to GitHub** (already done if you're reading this there).
+2. Go to [vercel.com/new](https://vercel.com/new), sign in with GitHub, and
+   **import this repository**. Vercel auto-detects Next.js — accept the
+   defaults and click **Deploy**. The first deploy will succeed and show the
+   demo (it needs no secrets to render sample data).
+3. Note the URL Vercel gives you, e.g. `https://daily-digest-xyz.vercel.app`.
+4. **Add the redirect URI in Google Cloud** → [Credentials](https://console.cloud.google.com/apis/credentials)
+   → your OAuth client → Authorized redirect URIs:
+   ```
+   https://<your-vercel-domain>/api/auth/callback/google
+   ```
+5. **Add environment variables in Vercel** (Project → Settings → Environment
+   Variables), then redeploy:
+
+   | Variable             | Value                                                |
+   | -------------------- | ---------------------------------------------------- |
+   | `AUTH_GOOGLE_ID`     | your OAuth client ID                                 |
+   | `AUTH_GOOGLE_SECRET` | your OAuth client secret                             |
+   | `AUTH_SECRET`        | a long random string (`openssl rand -base64 32`)     |
+
+   > On Vercel you do **not** need `AUTH_URL` — the host is detected
+   > automatically (and `trustHost` is enabled in `src/auth.ts`).
+
+6. Redeploy (Deployments → ⋯ → Redeploy) so the new env vars take effect, then
+   open your URL and click **Connect Google**.
+
+> While your Google OAuth app is in **Testing** mode, only accounts listed
+> under **Test users** on the consent screen can sign in. Add your own Google
+> account there. To let anyone sign in you'd submit the app for verification —
+> not needed for personal use.
+
+### Any other Node host
+
+The app is a standard Next.js app (`npm run build` / `npm run start`). On
+non-Vercel hosts, set the same env vars plus `AUTH_URL=https://your-domain`,
+and add the matching `/api/auth/callback/google` redirect URI in Google Cloud.
 
 ## Project layout
 
